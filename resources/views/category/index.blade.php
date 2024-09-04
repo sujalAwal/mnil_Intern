@@ -38,18 +38,18 @@
                             <th scope="row">{{++$index}}</th>
                             <td>{{$item->name}}</td>
                             <td>
-                                <form action="{{ route('category.changeStatus', ['id' => $item->id]) }}" method="POST" class="d-inline-block" onsubmit="return confirm('Are you sure you want to change status of this item?');">
+                                <form action="{{ route('category.changeStatus', ['id' => $item->id]) }}" method="POST" class="d-inline-block " >
                                     @csrf
                                     @method('PATCH')
                                @if ($item->status == 1)
                                
-                                <button type="submit"style="background-color: rgb(50, 239, 17); border-radius : 18px ;padding :3px; border: 2px solid rgb(50,239,17)" >
+                                <button type="submit" class="statusForm" style="background-color: rgb(50, 239, 17); border-radius : 18px ;padding :3px; border: 2px solid rgb(50,239,17)" >
                                     <span >  Active</span>
                             
                                 </button>
                                 
                                 @else
-                                <button type="submit"  style="background-color: rgb(233, 28, 17); border-radius : 18px ; padding: 3px; border: 2px solid rgb(233,28,17)" >
+                                <button type="submit" class="statusForm"  style="background-color: rgb(233, 28, 17); border-radius : 18px ; padding: 3px; border: 2px solid rgb(233,28,17)" >
                                     
                                     <span >  Inactive</span>
                                 </button>
@@ -65,10 +65,10 @@
                                     </a>
                     
                                     <!-- Delete Button (with confirmation dialog) -->
-                                    <form action="{{ route('category.destroy', ['id' => $item->id]) }}" method="POST" class="d-inline-block" onsubmit="return confirm('Are you sure you want to delete this item?');">
+                                    <form action="{{ route('category.destroy', ['id' => $item->id]) }}" method="POST" class="d-inline-block">
                                         @csrf
                                         @method('DELETE')
-                                        <button type="submit" class="btn btn-danger">
+                                        <button type="submit" class="btn btn-danger deleteCategory">
                                             <i class="fas fa-trash"></i> Delete
                                         </button>
                                         
@@ -86,4 +86,46 @@
         </div>
     </div>
 </div>
+@endsection
+@section('script')
+$(function(){
+    $(".statusForm").click(function(e){
+        e.preventDefault();
+        const form = $(this).closest("form");
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "Changing staus of the category!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, Change it!',
+            cancelButtonText: 'Cancel'
+        }).then((result)=>{
+            if(result.isConfirmed){
+                form.submit();
+            }
+        })
+    });
+    $(".deleteCategory").click(function(e){
+        e.preventDefault();
+        const deleteForm = $(this).closest("form");
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "Do you want to delete the category!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, Delete it!',
+            cancelButtonText: 'Cancel'
+        }).then((result)=>{
+            if(result.isConfirmed){
+                deleteForm.submit();
+            }
+        })
+
+    })
+    
+})
 @endsection
