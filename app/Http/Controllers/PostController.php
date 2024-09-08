@@ -180,33 +180,33 @@ catch(Exception $e){
     {
         
         //Multiple Images Capturing
-        if(empty($request->existing_images)){
-            $res =PostImage::where('post_id',$post->id)->get();
-            foreach($res as $img){
-                $img_Path = public_path("storage/").$img->image;
-                @unlink($img_Path);
+    //     if(empty($request->existing_images)){
+    //         $res =PostImage::where('post_id',$post->id)->get();
+    //         foreach($res as $img){
+    //             $img_Path = public_path("storage/").$img->image;
+    //             @unlink($img_Path);
 
-            }
-            PostImage::where('post_id',$post->id)->delete();
+    //         }
+    //         PostImage::where('post_id',$post->id)->delete();
 
 
-        }
-        else{
-            $dbImages = PostImage::where('post_id', $post->id)->get();
-            $existingImages = $request->existing_images;
+    //     }
+    //     else{
+    //         $dbImages = PostImage::where('post_id', $post->id)->get();
+    //         $existingImages = $request->existing_images;
         
-            foreach ($dbImages as $dbimg) {
-                if (!in_array($dbimg->image, $existingImages)) {
-                    $imgPath = public_path("storage/") . $dbimg->image;
-                    if (file_exists($imgPath)) {
-                        unlink($imgPath);
+    //         foreach ($dbImages as $dbimg) {
+    //             if (!in_array($dbimg->image, $existingImages)) {
+    //                 $imgPath = public_path("storage/") . $dbimg->image;
+    //                 if (file_exists($imgPath)) {
+    //                     unlink($imgPath);
                         
-                    }
-                    // Optionally delete the record from the database
-                    PostImage::where('id', $dbimg->id)->delete();
-        }
+    //                 }
+    //                 // Optionally delete the record from the database
+    //                 PostImage::where('id', $dbimg->id)->delete();
+    //     }
 
-    }}
+    // }}
 
         try{
             $request->validate([
