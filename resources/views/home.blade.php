@@ -19,7 +19,7 @@
                         <div class="container">
                             <h1 class="display-4 text-black">Welcome to PostWebApp</h1>
                             <p class="lead">Share your thoughts, ideas, and stories with the world.</p>
-                            <a href="/post/create" class="btn btn-warning text-black btn-lg">Submit Your Post</a>
+                            <a href="/post" class="btn btn-warning text-black btn-lg">Submit Your Post</a>
                         </div>
                     </header>
 

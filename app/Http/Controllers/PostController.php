@@ -20,6 +20,11 @@ class PostController extends Controller
         $post = Post::where('user_id',auth()->id())->with(['category','images'])->get();
         return view('post.index',compact('post'));
     }
+    public function loadPost()
+    {
+        $post = Post::where('user_id',auth()->id())->with(['category','images'])->get();
+        return response()->json(['post'=>$post],200);
+    }
 
     /**
      * Show the form for creating a new resource.
@@ -27,7 +32,7 @@ class PostController extends Controller
     public function create()
     {
         $category = Category::where('status','1')->get();
-        return view('post.create',compact('category'));
+        return response()->json($category,200);
     }
 
     /**
@@ -36,6 +41,9 @@ class PostController extends Controller
     public function store(Request $request)
     {
 
+        if(empty($request->postId)){
+
+        
       
         try{
             $request->validate([
@@ -70,16 +78,70 @@ try{
 }
 catch(Exception $e){
     DB::rollBack();
-    return redirect()->back()->with('error',$e->getMessage());
+    return response()->json(['error'=>$e->getMessage()],500);
 }
 
-            return redirect()->route('post.index')->with('success',"Post Created Successfully..");
+            return response()->json(['success'=>"Post Created Successfully..",'redirect_url' => route('post.index')],200);
 
 
 
         }catch(Exception $e){
-            return redirect()->back()->with('error',$e->getMessage());
+        
+            return response()->json(['error'=>$e->getMessage()],500);
         }
+        //Create Post Ended
+    }else{
+
+        //UPdate Post Started
+        try{
+            $request->validate([
+                'title'=>'required|unique:posts,title,'.$request->postId,
+                'description'=>'required|min:10',
+                'category_id'=>'required|max:3',
+                'status'=>'required|min:5',
+                'image.*' => 'nullable|mimes:png,jpg,jpeg|max:3000',
+
+            ]);
+          
+            DB::beginTransaction();
+try{
+
+    Post::findOrFail($request->postId)->update([
+        'title'=>$request->title  ,
+        'description'=>$request->description ,
+        'category_id'=>$request->category_id ,
+        'status'=>$request->status,
+    ]);
+      if($request->hasFile('image')){
+          foreach($request->image as $img){
+              
+              $result = $img->store('images','public');
+              if($result){
+                PostImage::create([
+                    'post_id'=>$request->postId,
+                    'image'=>$result,
+                ]);
+            }
+        }
+            }
+            
+            
+            DB::commit();
+        }
+catch(Exception $e){
+    DB::rollBack();
+    return response()->json(['error'=>$e->getMessage()],500);
+}
+    }catch(Exception $e){
+        return response()->json(['error'=>$e->getMessage()],500);
+        }
+
+       
+      
+        return response()->json(['success'=>"Post Updated Successfully..",'redirect_url' => route('post.index')],200);
+    }
+
+    
     }
 
     /**
@@ -97,17 +159,17 @@ catch(Exception $e){
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Post $post)
+    public function edit(int $pid)
     {
         try{
 
-            $postData = Post::with('images')->where('user_id',auth()->id())->findOrFail($post->id);
+            $postData = Post::with('images')->where('user_id',auth()->id())->findOrFail($pid);
             $category = Category::where('status','1')->get();
             
             // Pass the post data to the view
-            return view('post.edit', compact(['postData','category']));
+            return response()->json(['post'=>$postData,'category'=>$category],200);
         }catch(Exception $e){
-            abort(404,$e->getMessage());
+            return response()->json(['error',$e->getMessage()],500);
         }
     }
 
@@ -200,32 +262,57 @@ catch(Exception $e){
      */
     public function destroy(Post $post)
     {
-        // dd($post->id);
-      $data =  Post::where('id',$post->id)->with('images')->first();
+      try{
 
+          $data =  Post::where('id',$post->id)->with('images')->first();
+          
     //   $data->deleteOrFail();
       foreach ($data->images as $key => $value) {
         $imgPath =public_path('storage/'). $value->image;
     
-        @unlink($imgPath);
-      }
-      $data->delete();
+        if (file_exists($imgPath)) {
+            @unlink($imgPath);
+        }
+    }
+    $data->delete();
+    
+    return response()->json(['success'=>"Post Deleted !"],200);
+    // dd($post->id);
+}catch(Exception $e){
+    return response()->json(['error'=>$e->getMessage()],500);
+} 
+    }
 
-      return redirect()->back()->with('success',"Post Deleted !");
+    public function destroyImages(int $id){
+      try{
+
+          $img = PostImage::where('id',$id)->first();
+          $imgPath =public_path('storage/'). $img->image;
+          if (file_exists($imgPath)) {
+              @unlink($imgPath);
+            }
+            return response()->json(['success'=>"Post Deleted !"],200);
+        }
+        catch(Exception $e){
+            return response()->json(['error'=>$e->getMessage()],500);
+
+        }
+
     }
 
     public function changeStatus(int $id){
-        
-        $item = Post::findOrFail($id);
-        $sts = $item->status;
-        if($sts == "published"){
-            $item->status = "draft";
-        }else{
-            $item->status = "published";
+       try{
 
-        }
+           $item = Post::findOrFail($id);
+           $sts = $item->status;
+           $item->status = ($sts == "published") ? "draft" : "published";
+
         $item->save();
-        return redirect()->back();
+        return response()->json(['success'=>'Post('.$item->title.') Status Updated'],200);
+    }
+    catch(Exception $e){
+        return response()->json(['error'=>$e->getMessage()],500);
+    } 
     }
 
     

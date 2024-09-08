@@ -35,9 +35,9 @@ Route::prefix('category')->name('category.')->middleware('auth')->group(function
 Route::middleware('auth')->group(function(){
 
     Route::resource('post',PostController::class);
-    
+    Route::get('/loadPost',[PostController::class,'loadPost'])->name('post.loadPost');
     Route::patch('post/edit/status/{id}',[PostController::class,'changeStatus'])->name('post.changeStatus');
-    Route::delete('post/delete/images/{id}',[CategoryController::class,'destroyImages'])->name('post.destroy.img');
+    Route::delete('post/delete/images/{id}',[PostController::class,'destroyImages'])->name('post.destroy.img');
 });
 
 

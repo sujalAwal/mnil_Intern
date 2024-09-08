@@ -124,8 +124,8 @@
 </body>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+@yield('script')
 <script>
-  @yield('script')
   function load(){
           $.ajax({
         url:" {{route('category.index')}} ",
@@ -264,7 +264,7 @@ if (modal) {
         $.ajax({
           url:`{{route('category.edit','cngid')}}`.replace("cngid",id),
           type:'GET',
-          header:{
+          headers:{
             'X-CSRF-TOKEN':' {{csrf_token()}}'
 
           },
@@ -293,6 +293,7 @@ if (modal) {
       $(function () {
         $("#postName").val('');
         $("#postStauts").val('');
+        $("#unqId").val('');
         $(".sendBtn").removeClass("btn-success");
         $(".sendBtn").addClass("btn-primary");
         $(".modal-title").text("Add New Category");
