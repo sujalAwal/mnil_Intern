@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\PostController;
+use App\Http\Controllers\RolePermissionController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -40,6 +41,8 @@ Route::middleware('auth')->group(function(){
     Route::delete('post/delete/images/{id}',[PostController::class,'destroyImages'])->name('post.destroy.img');
 });
 
+Route::get('/rolePermission',[RolePermissionController::class,'dahboard'])->name('dashboard');
+Route::get('/rolePermission',[RolePermissionController::class,'dahboard'])->name('dashboard');
 
 
 

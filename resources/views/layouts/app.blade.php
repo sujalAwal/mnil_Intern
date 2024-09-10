@@ -37,7 +37,7 @@
                       </li>
                      
                       <li class="nav-item">
-                        <a class="nav-link disabled font-monospace" aria-disabled="true">About Us</a>
+                        <a class="nav-link  font-monospace" href="{{route('dashboard')}}">About Us</a>
                       </li>
                     </ul>
                     <form class="d-flex" role="search">
