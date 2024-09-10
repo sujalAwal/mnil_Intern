@@ -6,34 +6,49 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
     public function register(Request $res){
        try{
 
-           $validateData = $res->validate([
+        $res->validate([
                'name' => ['required', 'string', 'max:55'],
                'email' => ['required', 'string', 'email', 'max:25', 'unique:users'],
                'password' => ['required', 'string', 'min:8', 'confirmed'],
             ]);
-            $res = User::create($validateData);
-         return response()->json(['success'=>true,'message'=>"user Register Succesfully",'user'=>$res],200);   
+            
+           $ps = Hash::make($res->password);
+           $result= User::create([
+                'name' => $res->name,
+                'email' => $res->email,
+                'password' => $ps,
+            ]);
+         return response()->json(['success'=>true,'message'=>"user Register Succesfully",'user'=>$result],200);   
         }
         catch(Exception $e){
             return response()->json(['success'=>false,'message'=>$e->getMessage()],500);   
         }
     }
-    public function login(Request $res){
+    public function login(Request $req){
        try{
 
-           $validateData = $res->validate([
+          $data = $req->validate([
                'email' => ['required', 'string', 'email', 'max:25',],
                'password' => ['required', 'string', 'min:8' ],
             ]);
-            $res = User::where(['email'=>$res->email,'password'=>$res->password])->first();
-            $token = $res->createToken('auth_token')->accessToken;
-         return response()->json(['success'=>true,'message'=>"user Logined Succesfully",'user'=>$res,'token'=>$token],200);   
+            
+           
+            if(Auth::attempt($data)){
+
+                $user = User::where(['email'=>$req->email])->first();
+                $token = $user->createToken('auth_token')->accessToken;
+                return response()->json(['success'=>true,'message'=>"user Logined Succesfully",'user'=>$user,'token'=>$token],200);   
+            }else{
+                throw new Exception("Crediantials Doesnot Match",401);
+            }
         }
         catch(Exception $e){
             return response()->json(['success'=>false,'message'=>$e->getMessage()],500);   
