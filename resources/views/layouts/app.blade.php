@@ -14,6 +14,7 @@
     <link href="https://fonts.bunny.net/css?family=Nunito" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 
+
     <!-- Scripts -->
     @vite(['resources/sass/app.scss', 'resources/js/app.js'])
 </head>
@@ -37,7 +38,7 @@
                       </li>
                      
                       <li class="nav-item">
-                        <a class="nav-link  font-monospace" href="{{route('dashboard')}}">About Us</a>
+                        <a class="btn btn-outline-success mx-2" href="{{route('dashboard')}}">Role & Permissions</a>
                       </li>
                     </ul>
                     <form class="d-flex" role="search">
@@ -102,7 +103,7 @@
           <div class="mb-3">
             <label for="postName" class="form-label">Name</label>
             <input type="text" name="name" class="form-control" id="postName" aria-describedby="name">
-            
+           
           <div class="mb-3">
             <label for="postStauts" class="form-label">Status</label>
             <select class="form-select" id="postStauts" name="status" aria-label="Default select status">
@@ -154,10 +155,12 @@
                                     </button>
                     
                                     <!-- Delete Button (with confirmation dialog) -->
-                                    
+                                     @haspermission('Delete')
+         
                                         <button type="button" class="btn btn-danger deleteCategory" id="${data.id}" >
                                             <i class="fas fa-trash">Delete</i> 
                                         </button>
+                                           @endhaspermission
                                         
                                     
                                 </div>
@@ -169,10 +172,13 @@
             <div class="col-md-8">
                 <div class="card" style="background-color: rgb(230, 208, 13); color: rgb(0, 92, 252); font-size: 20px;">
                     <div class="position-relative card-header text-success text-center text-monospace" style="height: 100px; font-family: Georgia, 'Times New Roman', Times, serif; font-size: 2rem">
-                        {{ __('Category Section') }}
+                      {{ __('Category Section') }}
+                      @haspermission('Create') 
                         <button data-bs-toggle="modal" id="addNew" data-bs-target="#modal" data-bs-whatever="@getbootstrap"  class="bg-success bg-opacity-70 border border-info border-start-0 rounded-start position-absolute bottom-0 end-0">
-                            <h5 class="text-white" style="text-decoration: none; font-size: 1rem">ADD NEW</h5>
+                          <h5 class="text-white" style="text-decoration: none; font-size: 1rem">ADD NEW</h5>
+                      
                         </button>
+                        @endhaspermission
                     </div>
                     <div class="card-body text-center">
                         <table class="table">
@@ -342,7 +348,9 @@ $(document).on("submit",".modalForm",function(e){
       })
       $(document).on("click",".deleteCategory",(e)=>{
       e.preventDefault();
+      
       let deleteid= e.currentTarget.id;
+      console.log(deleteid);
      $.ajax({
       url:`{{route('category.destroy','id')}}`.replace("id",deleteid),
       type:"DELETE",
@@ -361,6 +369,10 @@ $(document).on("submit",".modalForm",function(e){
                 load();
             
         });
+          },
+          error:(e)=>{
+            console.log(e);
+            
           }
 
      })

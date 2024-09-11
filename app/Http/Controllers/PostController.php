@@ -12,6 +12,12 @@ use Illuminate\Support\Facades\DB;
 
 class PostController extends Controller
 {
+    public function __construct(){
+        $this->middleware('permission:Read',['only'=>['index','show']]);
+        $this->middleware('permission:Update',['only'=>['edit','update','changeStatus']]);
+        $this->middleware('permission:Create',['only'=>['create','store']]);
+        $this->middleware('permission:Delete',['only'=>['destroy','destroyImages']]);
+    }
     /**
      * Display a listing of the resource.
      */
@@ -299,7 +305,7 @@ catch(Exception $e){
         }
 
     }
-
+    
     public function changeStatus(int $id){
        try{
 

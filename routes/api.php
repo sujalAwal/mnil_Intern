@@ -34,8 +34,11 @@ Route::get('/logout',[AuthController::class,'destroyToken'])->middleware('auth:a
 Route::middleware('auth:api')->controller(CategoryController::class)->prefix('category')->group(function(){
    
     Route::get('/','index');
-    Route::get('/{id}','show');
-    Route::post('/create','store');
-    Route::put('/update/{id}','update');
-    Route::delete('/{id}','destroy');
+    Route::get('/{id}','show')->middleware('permission:Create');
+    Route::post('/create','store')->middleware('permission:Create');
+    Route::put('/update/{id}','update')->middleware('permission:Update');
+    Route::delete('/{id}','destroy')->middleware('permission:Delete');
 });
+
+
+

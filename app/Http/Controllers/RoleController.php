@@ -3,15 +3,23 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Spatie\Permission\Models\Role;
 
 class RoleController extends Controller
 {
+    public function __construct(){
+        $this->middleware('permission:Read',['only'=>['index','show']]);
+        $this->middleware('permission:Update',['only'=>['edit','update']]);
+        $this->middleware('permission:Create',['only'=>['create','store']]);
+        $this->middleware('permission:Delete',['only'=>['destroy']]);
+    }
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        //
+        $role = Role::all();
+        return view('rolePermission.Role.index',compact('role'));
     }
 
     /**
@@ -19,7 +27,7 @@ class RoleController extends Controller
      */
     public function create()
     {
-        //
+        return view('rolePermission.Role.create');
     }
 
     /**
@@ -27,7 +35,14 @@ class RoleController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'name'=>'required|unique:roles,name'
+        ]);
+      $role=  Role::create([
+            'name'=>$request->name
+        ]);
+        return response()->json(['success'=>true,'message'=>'Permission Created Succesfully','Role'=>$role],200);
+    
     }
 
     /**

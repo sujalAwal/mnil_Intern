@@ -86,10 +86,9 @@ class CategoryController extends Controller
     }
     }
 
-    public function destroy(Request $request, int $id){
+    public function destroy(int $id){
 
         try{
-
             $item =Category::findOrFail($id);     
             $item->delete();
             return response()->json(['success'=>"Category Has Deleted"],200);
